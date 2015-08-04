@@ -2,7 +2,7 @@ name:                cpio-conduit
 version:             0.7.0
 synopsis:            Conduit-based CPIO
 description:
-    This is a native Haskell implementation of the CPIO protocol over the Conduit library. See <http://www.gnu.org/software/cpio/>
+    This is a native Haskell implementation of the CPIO protocol over the Conduit library. See <http://www.gnu.org/software/cpio/>.
 
     Only the commonly used CPIO formats are supported (crc and newc).
 
