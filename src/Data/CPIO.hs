@@ -65,14 +65,14 @@ instance Show FormatError where
   show (InvalidMagic s)         = "invalid magic: " ++ (show s)
   show (InvalidHex s)           = "invalid hex: " ++ (show s)
 
-takeExactlyLazy :: Monad m => Int64 -> Consumer ByteString m BL.ByteString
+takeExactlyLazy :: Monad m => Int64 -> forall o. ConduitT ByteString o m BL.ByteString
 takeExactlyLazy len = do
     x <- CB.take $ fromIntegral len
     if BL.length x == len
         then return  x
         else E.throw TruncatedArchive
 
-takeExactly :: Monad m => Int64 -> Consumer ByteString m ByteString
+takeExactly :: Monad m => Int64 -> forall o. ConduitT ByteString o m ByteString
 takeExactly len = fmap (BS.concat . BL.toChunks) $ takeExactlyLazy len
 
 trailerText :: ByteString
@@ -82,7 +82,7 @@ alignTo4 :: Integral a => a -> a
 alignTo4 0 = 0
 alignTo4 n = 3 - ((n - 1) `mod` 4)
 
-readCPIO :: Monad m => Conduit ByteString m Entry
+readCPIO :: Monad m => ConduitT ByteString Entry m ()
 readCPIO = do
   magic <- fmap (BS.concat . BL.toChunks) $ CB.take 6
   has_crc <-
@@ -127,7 +127,7 @@ readCPIO = do
        (_, _) ->
          E.throw (InvalidHex v)
 
-writeCPIO :: Monad m => Conduit Entry m ByteString
+writeCPIO :: Monad m => ConduitT Entry ByteString m ()
 writeCPIO = do
   entry_ <- await
   case entry_ of
