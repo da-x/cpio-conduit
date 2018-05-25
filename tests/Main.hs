@@ -31,10 +31,10 @@ err s = E.throw $ Msg s
 main :: IO ()
 main = do
   let filename = "tests/file.cpio"
-  lst <- runResourceT $ CB.sourceFile filename $$ readCPIO =$ CL.consume
+  lst <- runResourceT $ runConduit $ CB.sourceFile filename .| readCPIO .| CL.consume
   when (lst /= fileCpio) $ do
     err $ "Invalid output: " ++ (show lst)
-  new <- fmap BS.concat $ CL.sourceList lst $$ writeCPIO =$ CL.consume
+  new <- fmap BS.concat $ runConduit $ CL.sourceList lst .| writeCPIO .| CL.consume
   when (new /= encoded) $ do
     putStrLn $ "new: " ++ (show new)
     err $ "Invalid content generated"
