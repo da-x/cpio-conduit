@@ -112,7 +112,7 @@ readCPIO = do
   let entry =
         Entry inode mode uid gid nlink mtime filesize devmaj
               devmin rdevmaj rdevmin
-        (if has_crc then Nothing else Just crc32) filename filedata
+        (if has_crc then Just crc32 else Nothing) filename filedata
   when (filename /= trailerText) $ do
     yield entry
     _ <- takeExactly $ alignTo4 filesize_
