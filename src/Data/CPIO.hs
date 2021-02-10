@@ -122,10 +122,8 @@ readCPIO = do
     decodeR32 = do
       v <- takeExactly 8
       case B16.decode  v of
-       (decoded,  "") ->
-         return $ runGet getWord32be $ BL.fromChunks [ decoded ]
-       (_, _) ->
-         E.throw (InvalidHex v)
+        Right decoded -> return $ runGet getWord32be $ BL.fromChunks [ decoded ]
+        Left _ -> E.throw (InvalidHex v)
 
 writeCPIO :: Monad m => ConduitT Entry ByteString m ()
 writeCPIO = do
