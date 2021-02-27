@@ -1,3 +1,4 @@
+{-# LANGUAGE CPP                       #-}
 {-# LANGUAGE DeriveDataTypeable        #-}
 {-# LANGUAGE DeriveGeneric             #-}
 {-# LANGUAGE NoMonomorphismRestriction #-}
@@ -122,8 +123,13 @@ readCPIO = do
     decodeR32 = do
       v <- takeExactly 8
       case B16.decode  v of
+#if MIN_VERSION_base16_bytestring(1,0,0)
         Right decoded -> return $ runGet getWord32be $ BL.fromChunks [ decoded ]
         Left _ -> E.throw (InvalidHex v)
+#else
+        (decoded,  "") -> return $ runGet getWord32be $ BL.fromChunks [ decoded ]
+        (_, _) -> E.throw (InvalidHex v)
+#endif
 
 writeCPIO :: Monad m => ConduitT Entry ByteString m ()
 writeCPIO = do
